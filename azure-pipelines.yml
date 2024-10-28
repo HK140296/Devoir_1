@@ -1,0 +1,36 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+# 1. Installer le SDK .NET pour compiler l’application
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '6.x' # Remplacez par la version .NET requise
+  displayName: 'Installer .NET SDK'
+
+# 2. Compiler le projet
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+  displayName: 'Compiler le code'
+
+# 3. Valider le modèle ARM pour s'assurer qu'il est prêt pour le déploiement
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'NomConnexionAzure'
+    resourceGroupName: 'NomDuGroupeDeRessources'
+    location: 'East US'
+    csmFile: 'path/to/template.json'
+    csmParametersFile: 'path/to/parameters.json'
+  displayName: 'Valider le modèle ARM''
