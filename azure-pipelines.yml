@@ -1,0 +1,57 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  resourceGroupName: 'NomDuGroupeDeRessources'
+  location: 'East US'
+
+steps:
+# 1. Récupérer les secrets depuis Azure Key Vault pour sécuriser le déploiement
+- task: AzureKeyVault@1
+  inputs:
+    azureSubscription: 'NomConnexionAzure'
+    keyVaultName: 'NomDuKeyVault'
+    secretsFilter: '*' # Pour récupérer tous les secrets
+  displayName: 'Récupérer les secrets d’Azure Key Vault'
+
+# 2. Déployer les ressources ARM (Load Balancer et VMs)
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'NomConnexionAzure'
+    resourceGroupName: '$(resourceGroupName)'
+    location: '$(location)'
+    csmFile: 'path/to/load_balancer_template.json'
+    csmParametersFile: 'path/to/load_balancer_parameters.json'
+  displayName: 'Déployer le load balancer et les VMs'
+
+# 3. Déployer le site web sur les VMs
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'NomConnexionAzure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Commande de déploiement du site web
+      az webapp deploy --name NomDuSiteWeb --resource-group $(resourceGroupName) --src-path 'path/to/site'
+  displayName: 'Déployer le site web sur les VMs'
+
+# 4. Configurer l’auto-scaling pour gérer les charges de travail
+- task: AzureCLI@2
+  inputs:
+    azureSubscription: 'NomConnexionAzure'
+    scriptType: 'bash'
+    scriptLocation: 'inlineScript'
+    inlineScript: |
+      # Configuration de l'auto-scaling pour les VMs
+      az vmss create --resource-group $(resourceGroupName) --name vmss-loadbalancer --image UbuntuLTS --admin-username azureuser
+      az monitor autoscale create --resource-group $(resourceGroupName) --resource vmss-loadbalancer --min-count 1 --max-count 5 --count 2
+  displayName: 'Configurer l’auto-scaling'
