@@ -37,4 +37,4 @@ steps:
     csmFile: '$(Build.SourcesDirectory)\AzureResourcesGroup5\azuredeploy.json'
     csmParametersFile: '$(Build.SourcesDirectory)\AzureResourcesGroup5\azuredeploy.parameters.json'
     overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)' 
-    deploymentMode: 'Validation'
+    deploymentMode: 'Incremental'
