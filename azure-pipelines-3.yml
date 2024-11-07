@@ -1,8 +1,7 @@
 trigger:
 - master
 
-pool:
-  vmImage: default
+pool: "default"
 
 variables:
 - name: CloudInitContent
