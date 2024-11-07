@@ -1,8 +1,3 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - master
 
@@ -17,7 +12,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $CloudContent = Get-Content -Path .\AzureResourceGroup5\Cloud-init.txt -Raw
+      $CloudContent = Get-Content -Path "$(Build.SourcesDirectory)/AzureResourceGroup5/cloud-init.txt" | Out-String
       Write-Host $CloudContent
       $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
       Write-Host $encodedContent
@@ -35,7 +30,7 @@ steps:
     resourceGroupName: 'evd_resource_group'
     location: 'Canada Central'
     templateLocation: 'Linked artifact'
-    csmFile: '$(Build.SourcesDirectory)\AzureResourcesGroup5\azuredeploy.json'
-    csmParametersFile: '$(Build.SourcesDirectory)\AzureResourcesGroup5\azuredeploy.parameters.json'
+    csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
+    csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
     overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)' 
     deploymentMode: 'Validation'
