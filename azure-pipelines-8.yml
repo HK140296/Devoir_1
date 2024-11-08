@@ -6,7 +6,7 @@
 trigger:
 - master
 
-pool: "Azure Pipelines"
+pool: "new_agent_pool"
 
 variables:
 - name: CloudInitContent
@@ -16,7 +16,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $CloudContent = Get-Content -Path .\AzureResourceGroup2\cloud_init.txt -Raw
+      $CloudContent = Get-Content -Path .\AzureResourceGroup2\Cloud-init.txt -Raw
       Write-Host $CloudContent
       $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
       Write-Host $encodedContent
@@ -24,6 +24,7 @@ steps:
 
 - script: |
     echo $(CloudInitContent)
+
 
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
