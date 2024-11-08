@@ -6,7 +6,7 @@
 trigger:
 - master
 
-pool: "Azure Pipelines"
+pool: "new_agent_pool"
 
 variables:
 - name: CloudInitContent
