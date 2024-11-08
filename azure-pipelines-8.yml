@@ -16,7 +16,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $CloudContent = Get-Content -Path .\AzureResourceGroup2\Cloud-Init.txt -Raw
+      $CloudContent = Get-Content -Path .\AzureResourceGroup2\cloud_init.txt -Raw
       Write-Host $CloudContent$endedContent = [Convert]::ToBase64Streing([Text.Encoding]::UTF8.GetBytes($CloudContent))
       Write-Host $endedContent
       Write-Host "##vso[task.setvariable variable=CloudInitContent;]$endedContent"
