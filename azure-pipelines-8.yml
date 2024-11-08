@@ -16,11 +16,10 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $CloudContent = Get-Content -Path .\AzureResourceGroup2\Cloud-init.txt -Raw
-      Write-Host $CloudContent
-      $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
-      Write-Host $encodedContent
-      Write-Host "##vso[task.setvariable variable=CloudInitContent;]$encodedContent"
+      $CloudContent = Get-Content -Path .\AzureResourceGroup2\Cloud-Init.txt -Raw
+      Write-Host $CloudContent$endedContent = [Convert]::ToBase64Streing([Text.Encoding]::UTF8.GetBytes($CloudContent))
+      Write-Host $endedContent
+      Write-Host "##vso[task.setvariable variable=CloudInitContent;]$endedContent"
 
 - script: |
     echo $(CloudInitContent)
