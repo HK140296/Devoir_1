@@ -1,0 +1,46 @@
+
+trigger:
+- master
+
+pool: "new_agent_pool"
+
+variables:
+- name: CloudInitContent
+
+steps:
+
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $CloudContent = Get-Content -Path "$(Build.SourcesDirectory)/AzureResourceGroup5/Cloud-Init.txt" | Out-String
+      Write-Host $CloudContent
+      $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
+      Write-Host $encodedContent
+      Write-Host "##vso[task.setvariable variable=CloudInitContent;]$encodedContent"
+
+- script: |
+    echo $(CloudInitContent)
+
+# Step to list files in AzureResourceGroup5 for debugging (using dir for Windows)
+- script: |
+    echo "Listing files in AzureResourceGroup5:"
+    dir $(Build.SourcesDirectory)\AzureResourceGroup5
+
+# Step to print Build Sources Directory for verification
+- script: |
+    echo "Build Sources Directory: $(Build.SourcesDirectory)"
+
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Subscription 1(90754b4e-6ff3-4abe-ab3c-17af43493fc1)'
+    subscriptionId: '90754b4e-6ff3-4abe-ab3c-17af43493fc1'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'evd_resource_group'
+    location: 'Canada Central'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
+    csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
+    overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)'
+    deploymentMode: 'Validation'
