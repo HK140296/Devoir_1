@@ -1,0 +1,54 @@
+trigger: none  # This pipeline does not trigger automatically; it will be triggered by the Build pipeline.
+
+pool: "new_agent_pool"
+
+resources:
+  pipelines:
+    - pipeline: buildPipeline
+      source: HK140296.Devoir_1
+      trigger: 
+        branches:
+          include: 
+            - master
+
+variables:
+  - name: CloudInitContent
+
+steps:
+# Download the CloudInit artifact from the Build Pipeline
+- task: DownloadPipelineArtifact@2
+  inputs:
+    buildType: 'specific'
+    project: 'Devoir_1'  # Replace with your Azure DevOps project name
+    pipeline: HK140296.Devoir_1  # The name of the build pipeline to download from
+    artifactName: 'CloudInitArtifact'
+    targetPath: '$(Pipeline.Workspace)'
+
+# Read CloudInitContent from the downloaded file
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      $CloudInitContent = Get-Content -Path "$(Pipeline.Workspace)/CloudInitContent.txt" -Raw
+      Write-Host "##vso[task.setvariable variable=CloudInitContent;]$CloudInitContent"
+      Write-Host "CloudInitContent has been read and set as a pipeline variable."
+
+# Debug step to ensure CloudInitContent is available in the deployment pipeline
+- script: |
+    echo "Debugging CloudInitContent in Deployment Pipeline:"
+    echo $(CloudInitContent)
+
+# Deploy Azure resources using the Azure Resource Manager template
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Subscription 1(90754b4e-6ff3-4abe-ab3c-17af43493fc1)'
+    subscriptionId: '90754b4e-6ff3-4abe-ab3c-17af43493fc1'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'evd_resource_group'
+    location: 'Canada Central'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
+    csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
+    overrideParameters: "-customData '$(CloudInitContent)' -adminPassword $(AdminPass)"
+    deploymentMode: 'Incremental'
