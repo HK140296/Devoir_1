@@ -12,7 +12,7 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      $CloudContent = Get-Content -Path "$(Build.SourcesDirectory)/AzureResourceGroup5/Cloud-Init.txt" | Out-String
+      $CloudContent = Get-Content -Path "$(Build.SourcesDirectory)/AzureResourceGroup5/Cloud-Init.txt" -Raw
       Write-Host "Cloud-Init content before encoding:"
       Write-Host $CloudContent
       $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
