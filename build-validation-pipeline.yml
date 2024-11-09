@@ -1,5 +1,5 @@
 trigger:
-- master
+  - master
 
 pool: "new_agent_pool"
 
@@ -13,13 +13,16 @@ steps:
     targetType: 'inline'
     script: |
       $CloudContent = Get-Content -Path "$(Build.SourcesDirectory)/AzureResourceGroup5/Cloud-Init.txt" | Out-String
+      Write-Host "Cloud-Init content before encoding:"
       Write-Host $CloudContent
       $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
+      Write-Host "Base64 Encoded Cloud-Init content:"
       Write-Host $encodedContent
       Write-Host "##vso[task.setvariable variable=CloudInitContent;]$encodedContent"
 
 # Display CloudInit content (for debugging purposes)
 - script: |
+    echo "Encoded CloudInitContent variable for debugging:"
     echo $(CloudInitContent)
 
 # Step to list files in AzureResourceGroup5 for debugging
