@@ -5,7 +5,7 @@ pool: "new_agent_pool"
 resources:
   pipelines:
     - pipeline: buildPipeline
-      source: HK140296.Devoir_1 (37)
+      source: build-pipeline-encoded
       trigger: 
         branches:
           include: 
@@ -20,7 +20,7 @@ steps:
   inputs:
     buildType: 'specific'
     project: 'Devoir_1'  # Replace with your Azure DevOps project name
-    pipeline: HK140296.Devoir_1 (37)  # The name of the build pipeline to download from
+    pipeline: build-pipeline-encoded  # The name of the build pipeline to download from
     artifactName: 'CloudInitArtifact'
     targetPath: '$(Pipeline.Workspace)'
 
