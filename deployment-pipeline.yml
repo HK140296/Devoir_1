@@ -25,6 +25,11 @@ steps:
     artifactName: 'CloudInitArtifact'
     targetPath: '$(Pipeline.Workspace)'
 
+# Debug step to ensure CloudInitContent is available in the deployment pipeline
+- script: |
+    echo "Debugging CloudInitContent in Deployment Pipeline:"
+    echo $(CloudInitContent)
+
 # Deploy Azure resources using the Azure Resource Manager template
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
@@ -37,5 +42,5 @@ steps:
     templateLocation: 'Linked artifact'
     csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
     csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
-    overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)'
+    overrideParameters: "-customData '$(CloudInitContent)' -adminPassword $(AdminPass)"
     deploymentMode: 'Incremental'
