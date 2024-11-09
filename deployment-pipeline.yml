@@ -20,7 +20,7 @@ steps:
 - task: DownloadPipelineArtifact@2
   inputs:
     buildType: 'specific'
-    project: 'YourProjectName'  # Replace with your Azure DevOps project name
+    project: 'Devoir_1'  # Replace with your Azure DevOps project name
     pipeline: buildPipeline  # The name of the build pipeline to download from
     artifactName: 'CloudInitArtifact'
     targetPath: '$(Pipeline.Workspace)'
