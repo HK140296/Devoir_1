@@ -1,18 +1,29 @@
 {
+  // Define the schema and content version of the deployment parameters file
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
+
+  // Define parameters and their values
   "parameters": {
+
+    // Azure region where resources will be deployed
     "location": {
       "value": "canadacentral"
     },
+
+    // Type of OS disk to be used for the VMs
     "osDiskType": {
       "value": "StandardSSD_LRS"
     },
+
+    // Address prefix for the virtual network
     "addressPrefixes": {
       "value": [
         "10.0.0.0/16"
       ]
     },
+
+    // Subnets within the virtual network
     "subnets": {
       "value": [
         {
@@ -23,12 +34,18 @@
         }
       ]
     },
+
+    // ID of the virtual network resource
     "virtualNetworkId": {
       "value": "/subscriptions/90754b4e-6ff3-4abe-ab3c-17af43493fc1/resourceGroups/evd_resource_group/providers/Microsoft.Network/virtualNetworks/evd_resource_group-vnet"
     },
+
+    // Name of the virtual network
     "virtualNetworkName": {
       "value": "evd_resource_group-vnet"
     },
+
+    // Network security group configuration, defining inbound rules
     "networkSecurityGroups": {
       "value": [
         {
@@ -52,6 +69,8 @@
         }
       ]
     },
+
+    // Configuration for the network interface attached to the VMs
     "networkInterfaceConfigurations": {
       "value": [
         {
@@ -73,48 +92,76 @@
         }
       ]
     },
+
+    // Name of the backend pool for load balancing
     "backendPoolName": {
       "value": "bepool"
     },
+
+    // Name of the load balancer
     "loadBalancerName": {
       "value": "evd_load_balancer2"
     },
+
+    // Load balancing rule's frontend port
     "loadbalancingRuleFrontEndPort": {
       "value": 80
     },
+
+    // Load balancing rule's backend port
     "loadbalancingRuleBackendEndPort": {
       "value": 80
     },
+
+    // Protocol used for the load balancing rule
     "loadbalancingRuleProtocol": {
       "value": "Tcp"
     },
+
+    // Starting port for inbound NAT rules
     "InboundNATRuleFrontEndPortRangeStart": {
       "value": 50000
     },
+
+    // Name of the virtual machine instance
     "vmName": {
       "value": "virtaul-machine-set"
     },
+
+    // Name of the virtual machine scale set
     "virtualMachineScaleSetName": {
       "value": "virtaul-machine-set"
     },
+
+    // Number of VM instances in the scale set
     "instanceCount": {
       "value": "2"
     },
+
+    // Size of the VM instances in the scale set
     "instanceSize": {
       "value": "Standard_D2s_v3"
     },
+
+    // Availability zones for high availability
     "zone": {
       "value": [
         "1",
         "2"
       ]
     },
+
+    // Whether to balance instances across zones
     "zoneBalance": {
       "value": "false"
     },
+
+    // Number of fault domains for resilience within the scale set
     "platformFaultDomainCount": {
       "value": "1"
     },
+
+    // Scaling policy for the VM scale set
     "scaleInPolicy": {
       "value": {
         "rules": [
@@ -123,45 +170,73 @@
         "forceDeletion": false
       }
     },
+
+    // Policy for upgrading the VM scale set instances
     "upgradePolicy": {
       "value": "Manual"
     },
+
+    // Whether hibernation is enabled for the VM instances
     "hibernationEnabled": {
       "value": false
     },
+
+    // Administrator username for the VMs
     "adminUsername": {
       "value": "vmadmin"
     },
+
+    // Administrator password for the VMs (set to null here)
     "adminPassword": {
       "value": null
     },
+
+    // Custom data for cloud-init (not set here)
     "customData": {
       "value": null
     },
+
+    // Security type for the VMs (e.g., Trusted Launch)
     "securityType": {
       "value": "TrustedLaunch"
     },
+
+    // Whether secure boot is enabled
     "secureBoot": {
       "value": true
     },
+
+    // Whether virtual Trusted Platform Module (vTPM) is enabled
     "vTPM": {
       "value": true
     },
+
+    // Protocol for the health monitoring extension
     "healthExtensionProtocol": {
       "value": "http"
     },
+
+    // Port for health checks
     "healthExtensionPort": {
       "value": 80
     },
+
+    // Request path for the health check
     "healthExtensionRequestPath": {
       "value": "/"
     },
+
+    // Whether auto-repair policies are enabled
     "autoRepairsPolicyEnabled": {
       "value": false
     },
+
+    // Grace period for the auto-repair policy
     "gracePeriod": {
       "value": "PT10M"
     },
+
+    // Action to take during auto-repair (e.g., Replace the instance)
     "autoRepairsAction": {
       "value": "Replace"
     }
