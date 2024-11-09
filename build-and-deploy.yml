@@ -1,0 +1,73 @@
+trigger:
+  - master
+
+pool: "new_agent_pool"
+
+variables:
+  - name: CloudInitContent
+
+stages:
+  # Validation Stage
+  - stage: Validation
+    jobs:
+      - job: ValidateDeployment
+        steps:
+          # Encode Cloud-Init file to Base64
+          - task: PowerShell@2
+            inputs:
+              targetType: 'inline'
+              script: |
+                $CloudContent = Get-Content -Path "$(Build.SourcesDirectory)/AzureResourceGroup5/Cloud-Init.txt" | Out-String
+                Write-Host "Cloud-Init content before encoding:"
+                Write-Host $CloudContent
+                $encodedContent = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($CloudContent))
+                Write-Host "Base64 Encoded Cloud-Init content:"
+                Write-Host $encodedContent
+                Write-Host "##vso[task.setvariable variable=CloudInitContent;]$encodedContent"
+
+          # Debug step to confirm CloudInitContent is set
+          - script: |
+              echo "Encoded CloudInitContent variable for debugging:"
+              echo $(CloudInitContent)
+
+          # List files in AzureResourceGroup5 for debugging
+          - script: |
+              echo "Listing files in AzureResourceGroup5:"
+              dir $(Build.SourcesDirectory)\AzureResourceGroup5
+
+          # Validation deployment
+          - task: AzureResourceManagerTemplateDeployment@3
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'Subscription 1(90754b4e-6ff3-4abe-ab3c-17af43493fc1)'
+              subscriptionId: '90754b4e-6ff3-4abe-ab3c-17af43493fc1'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'evd_resource_group'
+              location: 'Canada Central'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
+              csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
+              overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)'
+              deploymentMode: 'Validation'
+
+  # Deployment Stage (runs after validation)
+  - stage: Deployment
+    dependsOn: Validation
+    condition: succeeded()  # Run only if the validation stage succeeds
+    jobs:
+      - job: DeployResources
+        steps:
+          # Final deployment with Incremental mode
+          - task: AzureResourceManagerTemplateDeployment@3
+            inputs:
+              deploymentScope: 'Resource Group'
+              azureResourceManagerConnection: 'Subscription 1(90754b4e-6ff3-4abe-ab3c-17af43493fc1)'
+              subscriptionId: '90754b4e-6ff3-4abe-ab3c-17af43493fc1'
+              action: 'Create Or Update Resource Group'
+              resourceGroupName: 'evd_resource_group'
+              location: 'Canada Central'
+              templateLocation: 'Linked artifact'
+              csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
+              csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
+              overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)'
+              deploymentMode: 'Incremental'
