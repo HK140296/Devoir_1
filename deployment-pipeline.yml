@@ -1,0 +1,41 @@
+trigger: none  # This pipeline does not trigger automatically; it will be triggered by the Build pipeline.
+
+pool: "new_agent_pool"
+
+resources:
+  pipelines:
+    - pipeline: buildPipeline
+      source: HK140296.Devoir_1 (33)
+      trigger: 
+        branches:
+          include: 
+            - master
+
+variables:
+  - name: CloudInitContent
+    value: "$(resources.pipeline.buildPipeline.variables.CloudInitContent)"  # Pull variable from Build pipeline
+
+steps:
+# Download the CloudInit artifact from the Build Pipeline
+- task: DownloadPipelineArtifact@2
+  inputs:
+    buildType: 'specific'
+    project: 'Devoir_1'  # Replace with your Azure DevOps project name
+    pipeline: HK140296.Devoir_1 (33)  # The name of the build pipeline to download from
+    artifactName: 'CloudInitArtifact'
+    targetPath: '$(Pipeline.Workspace)'
+
+# Deploy Azure resources using the Azure Resource Manager template
+- task: AzureResourceManagerTemplateDeployment@3
+  inputs:
+    deploymentScope: 'Resource Group'
+    azureResourceManagerConnection: 'Azure subscription 1(96912487-ee6d-4629-8290-965822f2e75d)'
+    subscriptionId: '90754b4e-6ff3-4abe-ab3c-17af43493fc1'
+    action: 'Create Or Update Resource Group'
+    resourceGroupName: 'evd_resource_group'
+    location: 'Canada Central'
+    templateLocation: 'Linked artifact'
+    csmFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.json'
+    csmParametersFile: '$(Build.SourcesDirectory)/AzureResourceGroup5/azuredeploy.parameters.json'
+    overrideParameters: '-customData $(CloudInitContent) -adminPassword $(AdminPass)'
+    deploymentMode: 'Incremental'
