@@ -29,7 +29,7 @@ steps:
 - task: AzureResourceManagerTemplateDeployment@3
   inputs:
     deploymentScope: 'Resource Group'
-    azureResourceManagerConnection: 'Subscription 1(90754b4e-6ff3-4abe-ab3c-17af43493fc1)'
+    azureResourceManagerConnection: 'Azure subscription 1(96912487-ee6d-4629-8290-965822f2e75d)'
     subscriptionId: '90754b4e-6ff3-4abe-ab3c-17af43493fc1'
     action: 'Create Or Update Resource Group'
     resourceGroupName: 'evd_resource_group'
